@@ -1,6 +1,7 @@
 # adb-turbo
 
 [![Tests](https://github.com/kibotu/adb-turbo/actions/workflows/test.yml/badge.svg)](https://github.com/kibotu/adb-turbo/actions/workflows/test.yml)
+[![Deploy to GitHub Pages](https://github.com/kibotu/adb-turbo/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/kibotu/adb-turbo/actions/workflows/deploy-pages.yml)
 
 > Speed up your Android device with confidence
 
