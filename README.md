@@ -1,5 +1,7 @@
 # adb-turbo
 
+[![Tests](https://github.com/kibotu/adb-turbo/actions/workflows/test.yml/badge.svg)](https://github.com/kibotu/adb-turbo/actions/workflows/test.yml)
+
 > Speed up your Android device with confidence
 
 Ever felt like your Android device could be snappier? **adb-turbo** is here to help. This friendly web tool brings together 43 carefully curated ADB commands that can genuinely improve your device's performance—no root required, no complicated setup.
