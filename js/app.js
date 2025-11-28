@@ -879,7 +879,7 @@ function createCommandItem(command, categoryId) {
     header.appendChild(actions);
     
     const explanation = document.createElement('div');
-    explanation.className = 'command-explanation collapsed';
+    explanation.className = 'command-explanation';
     explanation.id = `${item.id}-explanation`;
     explanation.innerHTML = `
         <p>${command.explanation}</p>
@@ -900,6 +900,34 @@ function toggleCommandDetails(itemId) {
     const explanation = document.getElementById(`${itemId}-explanation`);
     if (explanation) {
         explanation.classList.toggle('collapsed');
+    }
+}
+
+/**
+ * Toggle all command details (expand/collapse all)
+ */
+function toggleAllDetails() {
+    const allExplanations = document.querySelectorAll('.command-explanation');
+    const btn = document.getElementById('expand-collapse-text');
+    
+    if (allExplanations.length === 0) {
+        logToConsole('No commands available to expand/collapse', 'warning');
+        return;
+    }
+    
+    // Check if any are currently expanded
+    const anyExpanded = Array.from(allExplanations).some(exp => !exp.classList.contains('collapsed'));
+    
+    if (anyExpanded) {
+        // Collapse all
+        allExplanations.forEach(exp => exp.classList.add('collapsed'));
+        btn.textContent = 'Expand All Details';
+        logToConsole('Collapsed all command details', 'info');
+    } else {
+        // Expand all
+        allExplanations.forEach(exp => exp.classList.remove('collapsed'));
+        btn.textContent = 'Collapse All Details';
+        logToConsole('Expanded all command details', 'info');
     }
 }
 

@@ -529,6 +529,22 @@ body::before {
 /* ============================================
    Command Categories
    ============================================ */
+.categories-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--spacing-lg);
+    animation: fadeInUp 0.6s ease-out both;
+}
+
+.categories-header .btn {
+    box-shadow: var(--shadow-md);
+}
+
+.categories-header .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
 .category {
     margin-bottom: var(--spacing-xl);
 }
