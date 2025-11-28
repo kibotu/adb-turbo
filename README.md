@@ -98,7 +98,7 @@ Apply optimized settings with one click:
 
 **Testing with SmolChat App:**
 
-We tested the profiles using the SmolChat app to measure their impact on token count for local LLMs:
+We tested the profiles using the [SmolChat-Android](https://github.com/shubham0204/SmolChat-Android)) to measure their impact on token count for local LLMs:
 
 <table>
   <tr>
