@@ -273,10 +273,6 @@ limitations under the License.
 
 ---
 
-## Contributing
-
-Contributions welcome! This tool helps iOS teams monitor and optimize app size metrics.
-
 **Questions or issues?** Open an issue on GitHub.
 
 **Found this useful?** Star the repository to help others discover it.
