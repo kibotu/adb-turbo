@@ -202,6 +202,8 @@ Your preferences are automatically saved and will be there when you come back!
 
 ## Troubleshooting
 
+### Connection Issues
+
 **No devices found?**
 - Double-check that your USB cable is properly connected
 - Make sure USB debugging is enabled in Developer Options
@@ -216,12 +218,12 @@ Your preferences are automatically saved and will be there when you come back!
 - Try restarting your terminal after installation
 - On Windows, you may need to manually add the platform-tools directory to your PATH
 
-**Command failed or no effect?**
-- Check the console output for helpful error messages
-- Some commands require specific Android versions (API level)
-- Samsung-specific commands are designed for Samsung devices only
-- Some settings may need a device reboot to take full effect
-- Try running the command manually via `adb shell` to see what's happening
+**Can't Connect ADB**
+- Try different cable/port, verify USB debugging enabled
+- Restart ADB server: `adb kill-server && adb start-server`
+- Restart device
+- Check USB connection mode (should be "File Transfer" or "PTP")
+- On Linux: Check udev rules
 
 **Port 8765 already in use?**
 ```bash
@@ -229,10 +231,127 @@ Your preferences are automatically saved and will be there when you come back!
 pkill -f "python.*app.py" # Manual cleanup
 ```
 
+### Command & Settings Issues
+
+**Command failed or no effect?**
+- Check the console output for helpful error messages
+- Some commands require specific Android versions (API level)
+- Samsung-specific commands are designed for Samsung devices only
+- Some settings may need a device reboot to take full effect
+- Try running the command manually via `adb shell` to see what's happening
+
+**Settings Not Working**
+- Verify setting applied: `adb shell settings get [namespace] [key]`
+- Output `null` means not supported on device
+- Check compatibility matrix in documentation
+- Restart device if setting requires reboot
+- Accept that some settings are device-specific (expected with Android fragmentation)
+
+**Settings Reset After Reboot**
+- Some settings don't persist by design
+- `setprop` commands are temporary, use `settings put` for persistence
+- Manufacturer updates may re-enable features
+- Use adb-turbo profiles to quickly re-apply settings
+
 **Permission denied errors?**
 - Make sure USB debugging is properly authorized
 - Some commands may not work on all devices or Android versions
 - Manufacturer-specific restrictions might apply
+
+### Performance Issues
+
+**Device Too Hot**
+- Disable Fixed Performance Mode immediately
+- Revert to 60Hz or adaptive refresh rate
+- Re-enable thermal management (Samsung GOS if disabled)
+- Allow device to cool before further use
+- Performance modes generate heat (expected trade-off)
+
+**Battery Draining Fast (>30% faster than baseline)**
+- Revert to Max Battery profile or baseline settings
+- Check refresh rate (120Hz constant drains battery)
+- Re-enable WiFi power save
+- Disable Fixed Performance Mode
+- Review battery stats: Settings → Battery → Battery Usage
+
+**Device Laggy After Changes**
+- Re-enable ZRAM if device has <8GB RAM
+- Check device temperature (thermal throttling?)
+- Review app background restrictions
+- Revert to baseline settings
+- Apply changes individually to identify cause
+- Disabled ZRAM on low-RAM devices causes performance issues
+
+**Apps Reloading Frequently**
+- Re-enable ZRAM: `adb shell settings put global zram_enabled 1`
+- Re-enable RAM Plus (Samsung): `adb shell settings put global ram_expand_size_list [original_value]`
+- Monitor multitasking behavior
+- Only disable ZRAM on devices with 8GB+ RAM
+
+### App Issues
+
+**Apps Crashing or Misbehaving**
+- Revert recent changes through backup/restore
+- Clear app cache: Settings → Apps → [App] → Clear Cache
+- Restart device
+- Test app behavior after revert
+- Reinstall problematic apps if issue persists
+- Test with non-critical apps first, one change at a time
+
+**Banking/Payment Apps Not Working**
+- Revert all settings to baseline (SafetyNet/Play Integrity checks)
+- Clear Google Play Services cache
+- Restart device
+- Test banking apps after revert
+- Check Play Integrity: Download "Play Integrity API Checker" from Play Store
+- Factory reset if issue persists (last resort)
+- Always test banking apps after any system changes
+
+**System UI Crashed**
+- Restart device (hold power button, select restart)
+- If device won't restart: Hold power button for 10+ seconds (force restart)
+- After restart: Immediately revert all changes through adb-turbo
+- Boot into Safe Mode if needed: Hold power → Long press "Power Off" → Boot to Safe Mode
+
+### Emergency Recovery
+
+**Quick Revert to Baseline**
+
+1. **adb-turbo backup/restore** (recommended)
+   - Use backup/restore feature in adb-turbo interface
+   - Fastest and safest method
+   - Restores exact previous state
+
+2. **Reset app preferences** (partial)
+   - Settings → System → Reset Options → Reset app preferences
+   - Resets some settings (not comprehensive)
+
+3. **Factory reset** (last resort)
+   - Settings → System → Reset → Factory data reset
+   - ⚠️ **WARNING:** Erases all data - backup first!
+   - Only if other methods fail
+
+### Getting Help
+
+**Before Requesting Help:**
+1. Revert to baseline settings
+2. Restart device
+3. Test in safe mode (isolates system vs. app issues)
+4. Document exact changes made
+5. Check if issue is device-specific or reproducible
+
+**Opening a GitHub Issue:**
+
+Search existing issues first: [github.com/kibotu/adb-turbo/issues](https://github.com/kibotu/adb-turbo/issues)
+
+When opening a new issue, include:
+- ✅ Device manufacturer and model
+- ✅ Android version and build number
+- ✅ Specific settings/commands that caused issues
+- ✅ Steps to reproduce
+- ✅ Expected vs. actual behavior
+- ✅ ADB output (if relevant)
+- ✅ Current device state (accessible normally, safe mode, etc.)
 
 Still stuck? Feel free to open an issue on GitHub – we're happy to help!
 
@@ -400,6 +519,84 @@ uv run pytest -k "test_execute"
 - **Testing:** pytest, pytest-cov
 - **Design:** Responsive, mobile-first, accessible
 
+## Design Philosophy
+
+**adb-turbo** is built on three core principles: accessibility, transparency, and education.
+
+### Accessibility
+We make Android's internal settings accessible to everyone—not just command-line experts. The tool provides:
+- Organized, searchable interface for scattered ADB commands
+- Clear categorization by impact and safety level
+- One-click profiles for common scenarios
+- Easy reversibility for safe experimentation
+
+### Transparency
+No hidden behavior, no magic optimizations. Every action shows:
+- Exact ADB command being executed
+- Target namespace and setting
+- Expected effect and trade-offs
+- Compatibility information
+- Manufacturer-specific notes
+
+You maintain full control and understanding of what happens on your device.
+
+### Education
+Understanding Android's internal settings is valuable for:
+- App developers optimizing for different device configurations
+- Technical leads evaluating device performance characteristics
+- QA teams testing under various system settings
+- Power users customizing their devices
+
+This tool is for learning, testing, and informed optimization—not guaranteed performance gains. Results vary by device, and understanding trade-offs is essential.
+
+## Roadmap & Community
+
+### Planned Features
+
+**Configuration Management:**
+- ✨ Custom profile creation and saving
+- ✨ Profile export/import for team sharing
+- ✨ Configuration versioning and comparison
+
+**Compatibility & Safety:**
+- ✨ Device compatibility detection (warn about unsupported commands)
+- ✨ Pre-execution command validation
+- ✨ Enhanced device information display
+- ✨ Compatibility database from community testing
+
+**Measurement & Analysis:**
+- ✨ Benchmark integration for objective results
+- ✨ Before/after comparison metrics
+- ✨ Battery and performance tracking
+
+**Advanced Features:**
+- Context-aware profile switching (battery level, app usage)
+- Per-app performance profiles
+- Community-contributed command categories (peer-reviewed)
+- Integration with CI/CD for automated device configuration
+
+### Community Contributions
+
+**Testing & Validation:**
+- Test on different devices and Android versions
+- Document compatibility findings
+- Share benchmark results and measurements
+- Validate settings behavior on various manufacturers
+
+**Documentation & Education:**
+- Improve command explanations
+- Add use case examples
+- Translate for international community
+- Create video tutorials
+
+**Development:**
+- Add new commands with documentation
+- Improve UI/UX
+- Build integrations (CI/CD, testing frameworks)
+- Contribute compatibility data
+
+Education and transparency remain core values. Understanding Android internals is as valuable as the optimizations themselves.
+
 ## Contributing
 
 Contributions are warmly welcomed! Whether you're fixing a bug, adding a feature, or improving documentation, your help makes this tool better for everyone. 🙌
@@ -410,15 +607,6 @@ Contributions are warmly welcomed! Whether you're fixing a bug, adding a feature
 4. **Run tests**: `uv run pytest`
 5. Test with real devices
 6. Submit a pull request
-
-**Ideas for contributions:**
-- Additional command categories
-- Better device compatibility detection
-- Batch command execution
-- Cloud sync for profiles
-- Community profile sharing
-- Enhanced test coverage
-- Translations and internationalization
 
 Every contribution, no matter how small, is appreciated! 💙
 
