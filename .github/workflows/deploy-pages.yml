@@ -65,8 +65,8 @@ jobs:
     
     - name: Deploy to GitHub Pages
       run: |
-        # Save the build directory path
-        BUILD_DIR="$(pwd)/build"
+        # Move build directory outside the repo to preserve it
+        mv build /tmp/gh-pages-build
         
         # Configure git
         git config --global user.name "github-actions[bot]"
@@ -86,8 +86,9 @@ jobs:
           git rm -rf .
         fi
         
-        # Copy build files to root
-        cp -r "$BUILD_DIR"/* .
+        # Copy build files from temp location to root
+        cp -r /tmp/gh-pages-build/* .
+        cp /tmp/gh-pages-build/.nojekyll .
         
         # Add all files
         git add -A
