@@ -344,7 +344,8 @@ async function onDeviceSelected() {
         state.deviceInfo = null;
         document.getElementById('device-info').style.display = 'none';
         document.getElementById('device-details-card').style.display = 'none';
-        document.getElementById('profiles-card').style.display = 'none';
+        // Keep profiles card visible but disable buttons
+        updateProfilesUIState(false);
         stopAutoRefresh();
         return;
     }
@@ -357,8 +358,9 @@ async function onDeviceSelected() {
     // Load device info
     await loadDeviceInfo(deviceId);
     
-    // Show profiles card
+    // Show profiles card and enable buttons
     document.getElementById('profiles-card').style.display = 'block';
+    updateProfilesUIState(true);
     
     // Load backups list
     await loadBackupsList();
@@ -1293,6 +1295,39 @@ function showImportDialog() {
 }
 
 /**
+ * Update profiles UI state (enable/disable buttons)
+ */
+function updateProfilesUIState(enabled) {
+    const profilesCard = document.getElementById('profiles-card');
+    const presetButtons = profilesCard.querySelectorAll('.preset-chip');
+    const actionButtons = profilesCard.querySelectorAll('.profile-actions .btn');
+    
+    presetButtons.forEach(btn => {
+        if (enabled) {
+            btn.classList.remove('disabled');
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+        } else {
+            btn.classList.add('disabled');
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+        }
+    });
+    
+    actionButtons.forEach(btn => {
+        if (enabled) {
+            btn.classList.remove('disabled');
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+        } else {
+            btn.classList.add('disabled');
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+        }
+    });
+}
+
+/**
  * Apply preset configuration
  */
 async function applyPreset(presetName) {
@@ -1373,6 +1408,10 @@ async function init() {
             icon.textContent = '▶️';
         }
     }
+    
+    // Show profiles card but with disabled buttons initially
+    document.getElementById('profiles-card').style.display = 'block';
+    updateProfilesUIState(false);
     
     // Check ADB availability
     await checkADB();

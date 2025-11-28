@@ -746,9 +746,11 @@ body::before {
     font-size: 1.125rem;
 }
 
-.btn:disabled {
+.btn:disabled,
+.btn.disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    pointer-events: none;
 }
 
 /* ============================================
@@ -1052,6 +1054,12 @@ body::before {
     text-align: center;
     position: relative;
     overflow: hidden;
+}
+
+.preset-chip.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .preset-chip::before {
