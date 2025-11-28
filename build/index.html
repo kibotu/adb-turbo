@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>adb-turbo (Demo) - Android Performance Optimizer</title>
+    <meta name="description" content="Demo: A friendly web-based tool for Android performance optimization via ADB. 43 commands across 13 categories. Run locally for full functionality.">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/js/demo-mode.js"></script>
+</head>
+<body>
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <h1 class="hero__title">adb-turbo</h1>
+            <p class="hero__subtitle">Friendly Android Performance Tuning Tool</p>
+            <div class="hero__stats">
+                <div class="stat">
+                    <span class="stat__number" id="total-commands">0</span>
+                    <span class="stat__label">Commands</span>
+                </div>
+                <div class="stat">
+                    <span class="stat__number" id="high-impact">0</span>
+                    <span class="stat__label">High Impact</span>
+                </div>
+                <div class="stat">
+                    <span class="stat__number" id="connected-devices">0</span>
+                    <span class="stat__label">Devices</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Getting Started Guide -->
+            <section class="card setup-guide" id="setup-guide">
+                <div class="card__header" onclick="toggleSection('setup-guide')">
+                    <h2 class="card__title">
+                        <span class="icon">🚀</span>
+                        Getting Started
+                    </h2>
+                    <button class="collapse-btn" aria-label="Toggle section">
+                        <span class="collapse-icon">▼</span>
+                    </button>
+                </div>
+                <div class="card__content">
+                    <div class="setup-step" id="adb-check">
+                        <div class="setup-step__header">
+                            <span class="setup-step__icon status-icon" id="adb-status-icon">⏳</span>
+                            <h3 class="setup-step__title">ADB Installation</h3>
+                        </div>
+                        <div class="setup-step__content" id="adb-check-content">
+                            <p>Checking ADB installation...</p>
+                        </div>
+                    </div>
+
+                    <div class="setup-step" id="device-check">
+                        <div class="setup-step__header">
+                            <span class="setup-step__icon status-icon" id="device-status-icon">⏳</span>
+                            <h3 class="setup-step__title">Device Connection</h3>
+                        </div>
+                        <div class="setup-step__content" id="device-check-content">
+                            <p>Waiting for ADB check...</p>
+                        </div>
+                    </div>
+
+                    <div class="setup-step">
+                        <div class="setup-step__header">
+                            <span class="setup-step__icon">💡</span>
+                            <h3 class="setup-step__title">Quick Tips</h3>
+                        </div>
+                        <div class="setup-step__content">
+                            <ul class="tips-list">
+                                <li>Enable <strong>USB Debugging</strong> in Developer Options on your Android device</li>
+                                <li>Connect your device via USB cable</li>
+                                <li>Allow USB debugging when prompted on your device</li>
+                                <li>Some commands may require device restart to take effect</li>
+                                <li>High impact commands may affect battery life</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Device Selection -->
+            <section class="card device-selector">
+                <div class="card__header">
+                    <h2 class="card__title">
+                        <span class="icon">📱</span>
+                        Device Selection
+                    </h2>
+                </div>
+                <div class="card__content">
+                    <div class="device-controls">
+                        <select id="device-select" class="device-select" disabled>
+                            <option value="">Select a device...</option>
+                        </select>
+                        <button id="refresh-devices" class="btn btn--secondary" onclick="refreshDevices()">
+                            <span class="btn__icon">🔄</span>
+                            Refresh
+                        </button>
+                    </div>
+                    <div id="device-info" class="device-info" style="display: none;">
+                        <div class="device-info__item">
+                            <span class="device-info__label">Model:</span>
+                            <span class="device-info__value" id="device-model">-</span>
+                        </div>
+                        <div class="device-info__item">
+                            <span class="device-info__label">Manufacturer:</span>
+                            <span class="device-info__value" id="device-manufacturer">-</span>
+                        </div>
+                        <div class="device-info__item">
+                            <span class="device-info__label">Android:</span>
+                            <span class="device-info__value" id="device-android">-</span>
+                        </div>
+                        <div class="device-info__item">
+                            <span class="device-info__label">Location:</span>
+                            <span class="device-info__value" id="device-location">-</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Device Details -->
+            <section class="card device-details-card" id="device-details-card" style="display: none;">
+                <div class="card__header">
+                    <div onclick="toggleSection('device-details-card')" style="flex: 1; cursor: pointer;">
+                        <h2 class="card__title">
+                            <span class="icon">📊</span>
+                            Device Details
+                            <span class="refresh-indicator" id="refresh-indicator" title="Auto-refreshing every 8 seconds">
+                                🔄
+                            </span>
+                        </h2>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <button class="btn btn--small" onclick="toggleAutoRefresh()" id="auto-refresh-btn" title="Toggle auto-refresh">
+                            <span id="auto-refresh-icon">⏸️</span>
+                        </button>
+                        <button class="collapse-btn" aria-label="Toggle device details" onclick="toggleSection('device-details-card')">
+                            <span class="collapse-icon">▼</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card__content">
+                    <div id="device-details-grid" class="device-details-grid">
+                        <!-- Details will be dynamically inserted here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Command Categories -->
+            <section id="categories-container">
+                <!-- Categories will be dynamically inserted here -->
+            </section>
+
+            <!-- Console Output -->
+            <section class="card console-card">
+                <div class="card__header" onclick="toggleSection('console-card')">
+                    <h2 class="card__title">
+                        <span class="icon">💻</span>
+                        Console Output
+                    </h2>
+                    <div class="console-actions">
+                        <button class="btn btn--small" onclick="clearConsole()">Clear</button>
+                        <button class="collapse-btn" aria-label="Toggle console">
+                            <span class="collapse-icon">▼</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card__content">
+                    <div id="console" class="console">
+                        <div class="console__line console__line--info">
+                            <span class="console__prompt">$</span>
+                            <span class="console__text">adb-turbo ready. Select a device to begin.</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Disclaimer -->
+            <section class="disclaimer">
+                <p>
+                    <strong>⚠️ Disclaimer:</strong> These optimizations may affect battery life and system stability. 
+                    Some changes require a device restart to take effect. Always ensure you understand what each 
+                    command does before executing it. Use at your own risk.
+                </p>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>adb-turbo • Built with ❤️ for the Android community</p>
+            <p class="footer__links">
+                <a href="https://developer.android.com/tools/adb" target="_blank" rel="noopener">ADB Documentation</a>
+                <span>•</span>
+                <a href="https://developer.android.com/studio/releases/platform-tools" target="_blank" rel="noopener">Platform Tools</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
+

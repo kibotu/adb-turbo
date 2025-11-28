@@ -1,0 +1,542 @@
+{
+  "data": {
+    "categories": [
+      {
+        "commands": [
+          {
+            "description": "Controls animation when opening/closing apps",
+            "disable_cmd": "shell settings put global window_animation_scale 0.0",
+            "enable_cmd": "shell settings put global window_animation_scale 1.0",
+            "explanation": "Disabling window animations makes your device feel significantly faster by removing the visual delay when opening or closing applications. This can reduce perceived lag and improve battery life.",
+            "get_cmd": "shell settings get global window_animation_scale",
+            "impact": "high",
+            "name": "Window Animation Scale",
+            "samsung_only": false
+          },
+          {
+            "description": "Controls animation when switching between apps",
+            "disable_cmd": "shell settings put global transition_animation_scale 0.0",
+            "enable_cmd": "shell settings put global transition_animation_scale 1.0",
+            "explanation": "Transition animations occur when switching between different apps. Disabling these results in instant transitions, making multitasking feel much snappier.",
+            "get_cmd": "shell settings get global transition_animation_scale",
+            "impact": "high",
+            "name": "Transition Animation Scale",
+            "samsung_only": false
+          },
+          {
+            "description": "Controls how long animations play before transitioning",
+            "disable_cmd": "shell settings put global animator_duration_scale 0.0",
+            "enable_cmd": "shell settings put global animator_duration_scale 1.0",
+            "explanation": "This setting governs the duration of all system animations. Setting it to 0 eliminates animation delays entirely, providing the most responsive experience.",
+            "get_cmd": "shell settings get global animator_duration_scale",
+            "impact": "high",
+            "name": "Animator Duration Scale",
+            "samsung_only": false
+          }
+        ],
+        "description": "Adjust or disable system animations for faster UI response and reduced battery consumption",
+        "id": "animation_settings",
+        "impact": "high",
+        "name": "Animation Settings"
+      },
+      {
+        "commands": [
+          {
+            "description": "Clear app caches to free up storage and improve performance",
+            "disable_cmd": "shell pm trim-caches 128G",
+            "enable_cmd": "",
+            "explanation": "Clearing app caches removes temporary files that can accumulate over time. This frees up storage space and can help apps run more smoothly. The command attempts to free 128GB, effectively clearing all caches.",
+            "get_cmd": null,
+            "impact": "high",
+            "name": "Trim All Caches",
+            "samsung_only": false
+          }
+        ],
+        "description": "Manage and terminate background processes to free up RAM and CPU resources",
+        "id": "background_processes",
+        "impact": "high",
+        "name": "Kill Background Apps"
+      },
+      {
+        "commands": [
+          {
+            "description": "Enable sustained high performance (may cause heating)",
+            "disable_cmd": "shell cmd power set-fixed-performance-mode-enabled false",
+            "enable_cmd": "shell cmd power set-fixed-performance-mode-enabled true",
+            "explanation": "Fixed performance mode clocks the CPU and GPU with upper and lower bounds, disabling thermal throttling. This provides maximum performance for demanding tasks but may cause the device to heat up and drain battery faster. Use with caution.",
+            "get_cmd": "shell dumpsys power | grep 'mFixedPerformanceModeEnabled'",
+            "impact": "high",
+            "name": "Fixed Performance Mode",
+            "samsung_only": false
+          }
+        ],
+        "description": "Lock CPU and GPU to maximum performance, disabling thermal throttling",
+        "id": "fixed_performance",
+        "impact": "high",
+        "name": "Fixed Performance Mode"
+      },
+      {
+        "commands": [
+          {
+            "description": "Disable compressed RAM (may improve performance on some devices)",
+            "disable_cmd": "shell settings put global zram_enabled 0",
+            "enable_cmd": "shell settings put global zram_enabled 1",
+            "explanation": "ZRAM creates virtual RAM by compressing memory. While it can help with multitasking, it uses CPU cycles for compression/decompression. Disabling it may improve performance on devices with sufficient physical RAM.",
+            "get_cmd": "shell settings get global zram_enabled",
+            "impact": "high",
+            "name": "ZRAM (Virtual RAM)",
+            "samsung_only": false
+          },
+          {
+            "description": "Disable RAM expansion feature (Samsung/some OEMs)",
+            "disable_cmd": "shell settings put global ram_expand_size_list 0",
+            "enable_cmd": "shell settings put global ram_expand_size_list 4",
+            "explanation": "RAM expansion uses storage as virtual memory. While it helps keep more apps in memory, it's slower than physical RAM and can reduce storage lifespan. Disabling it may improve overall system responsiveness.",
+            "get_cmd": "shell settings get global ram_expand_size_list",
+            "impact": "high",
+            "name": "RAM Expansion",
+            "samsung_only": false
+          }
+        ],
+        "description": "Disable virtual RAM expansion to improve performance and save battery",
+        "id": "ram_plus",
+        "impact": "high",
+        "name": "Disable RAM Plus"
+      },
+      {
+        "commands": [
+          {
+            "description": "Set maximum screen refresh rate (e.g., 120Hz)",
+            "disable_cmd": "shell settings put system peak_refresh_rate 60.0",
+            "enable_cmd": "shell settings put system peak_refresh_rate 120.0",
+            "explanation": "Higher refresh rates (90Hz, 120Hz) provide smoother scrolling and animations but consume more battery. Lowering to 60Hz can significantly extend battery life on devices with high refresh rate displays.",
+            "get_cmd": "shell settings get system peak_refresh_rate",
+            "impact": "medium",
+            "name": "Peak Refresh Rate",
+            "samsung_only": false
+          },
+          {
+            "description": "Set minimum screen refresh rate",
+            "disable_cmd": "shell settings put system min_refresh_rate 60.0",
+            "enable_cmd": "shell settings put system min_refresh_rate 120.0",
+            "explanation": "Setting a minimum refresh rate keeps the display at a constant rate. Lower minimum rates allow the system to reduce refresh rate when static content is displayed, saving battery.",
+            "get_cmd": "shell settings get system min_refresh_rate",
+            "impact": "medium",
+            "name": "Minimum Refresh Rate",
+            "samsung_only": false
+          },
+          {
+            "description": "Disable blur effects on windows and backgrounds",
+            "disable_cmd": "shell settings put global disable_window_blurs 1",
+            "enable_cmd": "shell settings put global disable_window_blurs 0",
+            "explanation": "Window blur effects require GPU processing. Disabling them reduces GPU load, potentially improving performance and battery life, especially on mid-range devices.",
+            "get_cmd": "shell settings get global disable_window_blurs",
+            "impact": "medium",
+            "name": "Window Blur Effects",
+            "samsung_only": false
+          },
+          {
+            "description": "Reduce transparency effects for better performance",
+            "disable_cmd": "shell settings put global accessibility_reduce_transparency 1",
+            "enable_cmd": "shell settings put global accessibility_reduce_transparency 0",
+            "explanation": "Transparency effects require additional rendering. Reducing transparency can improve performance, especially on devices with limited GPU capabilities.",
+            "get_cmd": "shell settings get global accessibility_reduce_transparency",
+            "impact": "medium",
+            "name": "Reduce Transparency",
+            "samsung_only": false
+          }
+        ],
+        "description": "Adjust screen refresh rate, window blur, and transparency for better performance",
+        "id": "refresh_rate",
+        "impact": "medium",
+        "name": "Refresh Rate & Display"
+      },
+      {
+        "commands": [
+          {
+            "description": "Disable Rakuten phone service (if present)",
+            "disable_cmd": "shell settings put system rakuten_denwa 0",
+            "enable_cmd": "shell settings put system rakuten_denwa 1",
+            "explanation": "Disables Rakuten phone service which may slow down app launches on devices with this service installed.",
+            "get_cmd": "shell settings get system rakuten_denwa",
+            "impact": "medium",
+            "name": "Rakuten Denwa Service",
+            "samsung_only": false
+          },
+          {
+            "description": "Disable automatic security report sending",
+            "disable_cmd": "shell settings put system send_security_reports 0",
+            "enable_cmd": "shell settings put system send_security_reports 1",
+            "explanation": "Prevents the system from automatically sending security reports, reducing background activity during app launches.",
+            "get_cmd": "shell settings get system send_security_reports",
+            "impact": "medium",
+            "name": "Security Reports",
+            "samsung_only": false
+          },
+          {
+            "description": "Disable automatic app error reporting",
+            "disable_cmd": "shell settings put secure send_action_app_error 0",
+            "enable_cmd": "shell settings put secure send_action_app_error 1",
+            "explanation": "Disables automatic error reporting which can slow down app startup, especially when apps crash or encounter errors.",
+            "get_cmd": "shell settings get secure send_action_app_error",
+            "impact": "medium",
+            "name": "App Error Reporting",
+            "samsung_only": false
+          },
+          {
+            "description": "Disable activity start logging",
+            "disable_cmd": "shell settings put global activity_starts_logging_enabled 0",
+            "enable_cmd": "shell settings put global activity_starts_logging_enabled 1",
+            "explanation": "Disables logging of app activity starts, reducing overhead during app launches.",
+            "get_cmd": "shell settings get global activity_starts_logging_enabled",
+            "impact": "medium",
+            "name": "Activity Start Logging",
+            "samsung_only": false
+          }
+        ],
+        "description": "Optimize app startup process for faster launch times",
+        "id": "app_launch_speed",
+        "impact": "medium",
+        "name": "Speed Up App Launch"
+      },
+      {
+        "commands": [
+          {
+            "description": "Disable Samsung Game SDK",
+            "disable_cmd": "shell settings put secure gamesdk_version 0",
+            "enable_cmd": "shell settings put secure gamesdk_version 1",
+            "explanation": "Samsung's Game SDK can throttle CPU/GPU performance. Disabling it may improve gaming performance but could cause overheating.",
+            "get_cmd": "shell settings get secure gamesdk_version",
+            "impact": "medium",
+            "name": "Game SDK",
+            "samsung_only": true
+          },
+          {
+            "description": "Disable Samsung Game Launcher home",
+            "disable_cmd": "shell settings put secure game_home_enable 0",
+            "enable_cmd": "shell settings put secure game_home_enable 1",
+            "explanation": "Disables the Game Launcher home feature, reducing background processes related to gaming.",
+            "get_cmd": "shell settings get secure game_home_enable",
+            "impact": "medium",
+            "name": "Game Home",
+            "samsung_only": true
+          },
+          {
+            "description": "Block Bixby during gaming",
+            "disable_cmd": "shell settings put secure game_bixby_block 1",
+            "enable_cmd": "shell settings put secure game_bixby_block 0",
+            "explanation": "Prevents Bixby from activating during gaming sessions, avoiding interruptions.",
+            "get_cmd": "shell settings get secure game_bixby_block",
+            "impact": "medium",
+            "name": "Game Bixby Block",
+            "samsung_only": true
+          },
+          {
+            "description": "Disable automatic temperature-based throttling in games",
+            "disable_cmd": "shell settings put secure game_auto_temperature_control 0",
+            "enable_cmd": "shell settings put secure game_auto_temperature_control 1",
+            "explanation": "Disables automatic thermal throttling during gaming. May improve performance but monitor device temperature.",
+            "get_cmd": "shell settings get secure game_auto_temperature_control",
+            "impact": "medium",
+            "name": "Game Auto Temperature Control",
+            "samsung_only": true
+          }
+        ],
+        "description": "Disable Samsung's Game Optimizing Service that may throttle performance",
+        "id": "game_optimization_samsung",
+        "impact": "medium",
+        "name": "Game Optimization (Samsung)"
+      },
+      {
+        "commands": [
+          {
+            "description": "Enable K2HD audio enhancement",
+            "disable_cmd": "shell settings put system k2hd_effect 0",
+            "enable_cmd": "shell settings put system k2hd_effect 1",
+            "explanation": "K2HD (K2 High Definition) enhances audio quality by upsampling and improving sound clarity. May slightly increase CPU usage.",
+            "get_cmd": "shell settings get system k2hd_effect",
+            "impact": "medium",
+            "name": "K2HD Audio Effect",
+            "samsung_only": false
+          },
+          {
+            "description": "Enable tube amplifier audio effect",
+            "disable_cmd": "shell settings put system tube_amp_effect 0",
+            "enable_cmd": "shell settings put system tube_amp_effect 1",
+            "explanation": "Tube amp effect simulates analog tube amplifier sound characteristics, adding warmth to audio output.",
+            "get_cmd": "shell settings get system tube_amp_effect",
+            "impact": "medium",
+            "name": "Tube Amp Effect",
+            "samsung_only": false
+          }
+        ],
+        "description": "Enable advanced audio processing for better sound quality",
+        "id": "audio_quality",
+        "impact": "medium",
+        "name": "Audio Quality Enhancement"
+      },
+      {
+        "commands": [
+          {
+            "description": "Reduce long-press delay for faster response",
+            "disable_cmd": "shell settings put secure long_press_timeout 250",
+            "enable_cmd": "shell settings put secure long_press_timeout 500",
+            "explanation": "Reduces the time required to register a long press, making the touchscreen feel more responsive. Lower values mean faster recognition.",
+            "get_cmd": "shell settings get secure long_press_timeout",
+            "impact": "medium",
+            "name": "Long Press Timeout",
+            "samsung_only": false
+          },
+          {
+            "description": "Reduce multi-press detection timeout",
+            "disable_cmd": "shell settings put secure multi_press_timeout 250",
+            "enable_cmd": "shell settings put secure multi_press_timeout 500",
+            "explanation": "Reduces the timeout for detecting multiple presses (like double-tap), improving responsiveness.",
+            "get_cmd": "shell settings get secure multi_press_timeout",
+            "impact": "medium",
+            "name": "Multi-Press Timeout",
+            "samsung_only": false
+          },
+          {
+            "description": "Minimize tap duration threshold",
+            "disable_cmd": "shell settings put secure tap_duration_threshold 0.0",
+            "enable_cmd": "shell settings put secure tap_duration_threshold 0.1",
+            "explanation": "Reduces the minimum time a tap must be held to register, making touches feel more immediate.",
+            "get_cmd": "shell settings get secure tap_duration_threshold",
+            "impact": "medium",
+            "name": "Tap Duration Threshold",
+            "samsung_only": false
+          },
+          {
+            "description": "Minimize touch blocking period",
+            "disable_cmd": "shell settings put secure touch_blocking_period 0.0",
+            "enable_cmd": "shell settings put secure touch_blocking_period 0.1",
+            "explanation": "Reduces the period during which touches are blocked after certain events, improving touch responsiveness.",
+            "get_cmd": "shell settings get secure touch_blocking_period",
+            "impact": "medium",
+            "name": "Touch Blocking Period",
+            "samsung_only": false
+          }
+        ],
+        "description": "Reduce touch latency and improve touchscreen responsiveness",
+        "id": "touchscreen_latency",
+        "impact": "medium",
+        "name": "Touchscreen Response"
+      },
+      {
+        "commands": [
+          {
+            "description": "Force GPU rendering with OpenGL",
+            "disable_cmd": "shell setprop debug.force-opengl 0",
+            "enable_cmd": "shell setprop debug.force-opengl 1",
+            "explanation": "Forces the system to use OpenGL for rendering, which may improve graphics performance on some devices.",
+            "get_cmd": "shell getprop debug.force-opengl",
+            "impact": "low",
+            "name": "Force OpenGL",
+            "samsung_only": false
+          },
+          {
+            "description": "Force GPU vertical sync",
+            "disable_cmd": "shell setprop debug.hwc.force_gpu_vsync 0",
+            "enable_cmd": "shell setprop debug.hwc.force_gpu_vsync 1",
+            "explanation": "Forces GPU-based vertical sync, which can reduce screen tearing but may slightly increase latency.",
+            "get_cmd": "shell getprop debug.hwc.force_gpu_vsync",
+            "impact": "low",
+            "name": "GPU VSync",
+            "samsung_only": false
+          },
+          {
+            "description": "Enable multicore packet scheduling",
+            "disable_cmd": "shell settings put system multicore_packet_scheduler 0",
+            "enable_cmd": "shell settings put system multicore_packet_scheduler 1",
+            "explanation": "Enables multicore packet scheduling for better network performance on multi-core processors.",
+            "get_cmd": "shell settings get system multicore_packet_scheduler",
+            "impact": "low",
+            "name": "Multicore Packet Scheduler",
+            "samsung_only": false
+          },
+          {
+            "description": "Enable enhanced CPU responsiveness (Samsung)",
+            "disable_cmd": "shell settings put global sem_enhanced_cpu_responsiveness 0",
+            "enable_cmd": "shell settings put global sem_enhanced_cpu_responsiveness 1",
+            "explanation": "Allows the CPU to spike to peak speed without sacrificing optimized mode. Samsung-specific feature.",
+            "get_cmd": "shell settings get global sem_enhanced_cpu_responsiveness",
+            "impact": "low",
+            "name": "Enhanced CPU Responsiveness",
+            "samsung_only": true
+          }
+        ],
+        "description": "Various system-level optimizations for CPU, GPU, and overall performance",
+        "id": "system_optimization",
+        "impact": "low",
+        "name": "System Optimization"
+      },
+      {
+        "commands": [
+          {
+            "description": "Enable/disable private DNS",
+            "disable_cmd": "shell settings put global private_dns_mode off",
+            "enable_cmd": "shell settings put global private_dns_mode hostname",
+            "explanation": "Private DNS encrypts DNS queries for enhanced privacy and security. May slightly impact connection speed.",
+            "get_cmd": "shell settings get global private_dns_mode",
+            "impact": "low",
+            "name": "Private DNS Mode",
+            "samsung_only": false
+          },
+          {
+            "description": "Use AdGuard DNS for ad blocking",
+            "disable_cmd": "shell settings put global private_dns_specifier ''",
+            "enable_cmd": "shell settings put global private_dns_specifier dns.adguard.com",
+            "explanation": "Configures AdGuard DNS which blocks ads and trackers at the DNS level, improving privacy and potentially reducing data usage.",
+            "get_cmd": "shell settings get global private_dns_specifier",
+            "impact": "low",
+            "name": "AdGuard DNS",
+            "samsung_only": false
+          }
+        ],
+        "description": "Configure private DNS for enhanced privacy and security",
+        "id": "private_dns",
+        "impact": "low",
+        "name": "Private DNS"
+      },
+      {
+        "commands": [
+          {
+            "description": "Disable WiFi power saving mode",
+            "disable_cmd": "shell settings put global wifi_power_save 0",
+            "enable_cmd": "shell settings put global wifi_power_save 1",
+            "explanation": "Disabling WiFi power save mode keeps WiFi at full power, improving connection stability and speed at the cost of battery life.",
+            "get_cmd": "shell settings get global wifi_power_save",
+            "impact": "low",
+            "name": "WiFi Power Save",
+            "samsung_only": false
+          },
+          {
+            "description": "Enable cellular data on device boot",
+            "disable_cmd": "shell settings put global enable_cellular_on_boot 0",
+            "enable_cmd": "shell settings put global enable_cellular_on_boot 1",
+            "explanation": "Automatically enables cellular data when the device boots, ensuring immediate connectivity.",
+            "get_cmd": "shell settings get global enable_cellular_on_boot",
+            "impact": "low",
+            "name": "Cellular on Boot",
+            "samsung_only": false
+          },
+          {
+            "description": "Keep mobile data always active (even on WiFi)",
+            "disable_cmd": "shell settings put global mobile_data_always_on 0",
+            "enable_cmd": "shell settings put global mobile_data_always_on 1",
+            "explanation": "Keeps mobile data active even when connected to WiFi for faster switching. Increases battery usage.",
+            "get_cmd": "shell settings get global mobile_data_always_on",
+            "impact": "low",
+            "name": "Mobile Data Always On",
+            "samsung_only": false
+          },
+          {
+            "description": "Enable tethering hardware offload",
+            "disable_cmd": "shell settings put global tether_offload_disabled 1",
+            "enable_cmd": "shell settings put global tether_offload_disabled 0",
+            "explanation": "Hardware offload improves tethering performance by using dedicated hardware instead of CPU.",
+            "get_cmd": "shell settings get global tether_offload_disabled",
+            "impact": "low",
+            "name": "Tether Offload",
+            "samsung_only": false
+          },
+          {
+            "description": "Disable constant Bluetooth LE scanning",
+            "disable_cmd": "shell settings put global ble_scan_always_enabled 0",
+            "enable_cmd": "shell settings put global ble_scan_always_enabled 1",
+            "explanation": "Disabling constant BLE scanning reduces battery drain and CPU usage from background Bluetooth activity.",
+            "get_cmd": "shell settings get global ble_scan_always_enabled",
+            "impact": "low",
+            "name": "BLE Scan Always Enabled",
+            "samsung_only": false
+          },
+          {
+            "description": "Disable network scoring UI",
+            "disable_cmd": "shell settings put global network_scoring_ui_enabled 0",
+            "enable_cmd": "shell settings put global network_scoring_ui_enabled 1",
+            "explanation": "Disables the network quality scoring interface, reducing background network analysis.",
+            "get_cmd": "shell settings get global network_scoring_ui_enabled",
+            "impact": "low",
+            "name": "Network Scoring UI",
+            "samsung_only": false
+          },
+          {
+            "description": "Disable automatic network recommendations",
+            "disable_cmd": "shell settings put global network_recommendations_enabled 0",
+            "enable_cmd": "shell settings put global network_recommendations_enabled 1",
+            "explanation": "Prevents the system from automatically recommending networks, reducing background scanning.",
+            "get_cmd": "shell settings get global network_recommendations_enabled",
+            "impact": "low",
+            "name": "Network Recommendations",
+            "samsung_only": false
+          }
+        ],
+        "description": "Optimize network settings to reduce background scanning and improve connectivity",
+        "id": "network_performance",
+        "impact": "low",
+        "name": "Network Performance"
+      },
+      {
+        "commands": [
+          {
+            "description": "Disable intelligent sleep mode",
+            "disable_cmd": "shell settings put system intelligent_sleep_mode 0",
+            "enable_cmd": "shell settings put system intelligent_sleep_mode 1",
+            "explanation": "Intelligent sleep mode uses sensors to detect if you're looking at the screen. Disabling it saves CPU cycles but screen may turn off while you're reading.",
+            "get_cmd": "shell settings get system intelligent_sleep_mode",
+            "impact": "low",
+            "name": "Intelligent Sleep Mode",
+            "samsung_only": false
+          },
+          {
+            "description": "Disable adaptive sleep (screen attention)",
+            "disable_cmd": "shell settings put secure adaptive_sleep 0",
+            "enable_cmd": "shell settings put secure adaptive_sleep 1",
+            "explanation": "Adaptive sleep keeps the screen on while you're looking at it. Disabling it may save battery but requires manual screen timeout management.",
+            "get_cmd": "shell settings get secure adaptive_sleep",
+            "impact": "low",
+            "name": "Adaptive Sleep",
+            "samsung_only": false
+          },
+          {
+            "description": "Enable app restriction for background activity",
+            "disable_cmd": "shell settings put global app_restriction_enabled false",
+            "enable_cmd": "shell settings put global app_restriction_enabled true",
+            "explanation": "Restricts background activity of apps to save battery and improve performance.",
+            "get_cmd": "shell settings get global app_restriction_enabled",
+            "impact": "low",
+            "name": "App Restrictions",
+            "samsung_only": false
+          },
+          {
+            "description": "Disable automatic power save mode",
+            "disable_cmd": "shell settings put global automatic_power_save_mode 0",
+            "enable_cmd": "shell settings put global automatic_power_save_mode 1",
+            "explanation": "Prevents the system from automatically enabling power save mode at low battery levels.",
+            "get_cmd": "shell settings get global automatic_power_save_mode",
+            "impact": "low",
+            "name": "Automatic Power Save",
+            "samsung_only": false
+          },
+          {
+            "description": "Disable adaptive battery management",
+            "disable_cmd": "shell settings put global adaptive_battery_management_enabled 0",
+            "enable_cmd": "shell settings put global adaptive_battery_management_enabled 1",
+            "explanation": "Adaptive battery learns your usage patterns to optimize battery life. Disabling it gives you more control but may reduce battery efficiency.",
+            "get_cmd": "shell settings get global adaptive_battery_management_enabled",
+            "impact": "low",
+            "name": "Adaptive Battery Management",
+            "samsung_only": false
+          }
+        ],
+        "description": "Configure power-saving features and battery optimization settings",
+        "id": "power_management",
+        "impact": "low",
+        "name": "Power Management"
+      }
+    ]
+  },
+  "success": true,
+  "timestamp": "2025-11-28T12:40:00.963989+00:00"
+}
