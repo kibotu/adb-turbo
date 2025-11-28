@@ -156,8 +156,9 @@ def create_demo_mode_script():
       
       console.log('🎭 Intercepting API call:', endpoint);
       
-      // Convert API endpoint to static JSON file path
-      const jsonPath = endpoint.replace('/api/', '/api/') + '.json';
+      // Convert API endpoint to static JSON file path (relative)
+      // /api/check-adb -> ./api/check-adb.json
+      const jsonPath = '.' + endpoint + '.json';
       
       try {
         const response = await originalFetch(jsonPath);
@@ -213,10 +214,23 @@ def inject_demo_mode():
         with open(index_path, 'r') as f:
             html_content = f.read()
         
+        # Fix static file paths for GitHub Pages
+        # Change /static/css/style.css to ./css/style.css (relative path)
+        html_content = html_content.replace(
+            'href="/static/css/style.css"',
+            'href="./css/style.css"'
+        )
+        
+        # Change /static/js/app.js to ./js/app.js (relative path)
+        html_content = html_content.replace(
+            'src="/static/js/app.js"',
+            'src="./js/app.js"'
+        )
+        
         # Inject demo mode script before closing head tag
         html_content = html_content.replace(
             '</head>',
-            '    <script src="/js/demo-mode.js"></script>\n</head>'
+            '    <script src="./js/demo-mode.js"></script>\n</head>'
         )
         
         # Update title to indicate demo
@@ -235,6 +249,7 @@ def inject_demo_mode():
             f.write(html_content)
         
         print("  ✓ Demo mode injected successfully")
+        print("  ✓ Static file paths fixed for GitHub Pages")
         return True
     
     except Exception as e:
