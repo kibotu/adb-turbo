@@ -1,6 +1,6 @@
 # ADB Performance Optimizer
 
-Professional web tool for Android performance tuning via ADB commands. 43 optimizations across 13 categories.
+A web-based tool for Android performance tuning via ADB commands. Control 43 optimizations across 13 categories through a clean interface.
 
 ## Quick Start
 
@@ -9,49 +9,16 @@ Professional web tool for Android performance tuning via ADB commands. 43 optimi
 run.bat     # Windows
 ```
 
-Opens **http://localhost:8765** automatically.
+The server starts at **http://localhost:8765** and opens automatically in your browser.
 
-**Stop server:** Press `Ctrl+C` (port is automatically freed)
+**Stop server:** Press `Ctrl+C`
 
-## Prerequisites
+## Requirements
 
-- Python 3.10+
-- UV package manager (auto-installed if missing)
-- ADB ([install guide](#installing-adb))
-- USB debugging enabled on Android device
-
-## Usage
-
-1. **Enable Developer Mode** on Android:
-   - Settings → About Phone → Tap "Build Number" 7 times
-   - Settings → Developer Options → Enable "USB Debugging"
-
-2. **Connect device** via USB and allow debugging prompt
-
-3. **Run** `./run.sh` and select your device
-
-4. **Toggle optimizations** - start with High Impact commands
-
-## Command Categories
-
-### High Impact
-- **Animation Settings** (3) - Disable UI animations for instant response
-- **Background Processes** (1) - Clear caches and kill background apps
-- **Fixed Performance** (1) - Lock CPU/GPU to maximum (may heat up)
-- **RAM Plus** (2) - Disable virtual RAM expansion
-
-### Medium Impact
-- **Display & Refresh** (4) - Adjust refresh rate, blur, transparency
-- **App Launch Speed** (4) - Optimize startup process
-- **Game Optimization** (4) - Disable Samsung throttling (Samsung only)
-- **Audio Quality** (2) - Enable K2HD and Tube Amp effects
-- **Touchscreen** (4) - Reduce touch latency
-
-### Low Impact
-- **System** (4) - CPU/GPU optimizations
-- **DNS** (2) - Private DNS configuration
-- **Network** (7) - WiFi and cellular settings
-- **Power** (5) - Battery management
+- **Python 3.10+**
+- **ADB (Android Debug Bridge)** - [installation instructions below](#installing-adb)
+- **UV package manager** - auto-installed by run scripts if missing
+- **Android device** with USB debugging enabled
 
 ## Installing ADB
 
@@ -60,94 +27,237 @@ Opens **http://localhost:8765** automatically.
 brew install android-platform-tools
 ```
 
-**Linux:**
+**Linux (Debian/Ubuntu):**
 ```bash
 sudo apt install android-tools-adb
 ```
 
 **Windows:**
+
 Download [Android SDK Platform Tools](https://developer.android.com/studio/releases/platform-tools) and add to PATH.
 
-## Manual Setup
+**Verify installation:**
+```bash
+adb version
+```
+
+## Setup Your Device
+
+1. **Enable Developer Mode:**
+   - Go to Settings → About Phone
+   - Tap "Build Number" 7 times
+   - You'll see "You are now a developer!"
+
+2. **Enable USB Debugging:**
+   - Go to Settings → Developer Options
+   - Enable "USB Debugging"
+
+3. **Connect & Authorize:**
+   - Connect your device via USB
+   - Accept the "Allow USB debugging?" prompt on your device
+   - Check the "Always allow from this computer" box
+
+4. **Verify Connection:**
+   ```bash
+   adb devices
+   ```
+   You should see your device listed.
+
+## Usage
+
+1. Run the application with `./run.sh` or `run.bat`
+2. Select your device from the dropdown
+3. Browse command categories organized by impact level
+4. Toggle commands on/off with a single click
+5. View real-time command output and current states
+
+Your preferences are saved and persist across sessions.
+
+## What It Does
+
+This tool provides a user-friendly interface for ADB commands that optimize Android performance. Commands are organized by impact:
+
+### High Impact
+- **Animation Settings** (3 commands) - Disable UI animations for instant response
+- **Background Processes** (1 command) - Clear caches and free up RAM
+- **Fixed Performance Mode** (1 command) - Lock CPU/GPU to maximum (may heat up device)
+- **RAM Plus** (2 commands) - Disable virtual RAM expansion
+
+### Medium Impact
+- **Display & Refresh Rate** (4 commands) - Adjust refresh rate, blur, transparency
+- **App Launch Speed** (4 commands) - Optimize app startup process
+- **Game Optimization** (4 commands) - Disable Samsung throttling (Samsung devices only)
+- **Audio Quality** (2 commands) - Enable K2HD and Tube Amp effects
+- **Touchscreen Response** (4 commands) - Reduce touch latency
+
+### Low Impact
+- **System Optimization** (4 commands) - CPU/GPU rendering tweaks
+- **Private DNS** (2 commands) - Configure DNS for privacy
+- **Network Performance** (7 commands) - WiFi and cellular optimizations
+- **Power Management** (5 commands) - Battery and sleep settings
+
+## Manual Installation
+
+If you prefer to install dependencies manually:
 
 ```bash
-# Install UV (if not already installed)
+# Install UV package manager
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Install dependencies and run
+# Install dependencies
 uv sync
+
+# Run the application
 uv run python app.py
 ```
 
-Learn more about UV at [docs.astral.sh/uv](https://docs.astral.sh/uv/getting-started/)
-
-## Troubleshooting
-
-**No devices found?**
-- Check USB cable and connection
-- Enable USB debugging in Developer Options
-- Allow debugging prompt on device
-- Run `adb devices` in terminal to verify
-
-**ADB not found?**
-- Install ADB (see above)
-- Ensure it's in your PATH
-- Restart terminal after installation
-
-**Command failed?**
-- Check console output for details
-- Some commands need specific Android versions
-- Samsung-only commands won't work on other devices
-- Reboot device if needed
-
-**Port already in use?**
-- Run `./cleanup.sh` to free port 8765
-- Or manually: `pkill -f "python.*app.py"`
-
-## API Endpoints
-
-```
-GET  /                          # Web interface
-GET  /api/check-adb             # Verify ADB installation
-GET  /api/devices               # List connected devices
-GET  /api/device-info/<id>      # Device details
-GET  /api/categories            # All commands
-POST /api/execute               # Run command
-POST /api/get-setting           # Get current value
-```
+Learn more about UV at [docs.astral.sh/uv](https://docs.astral.sh/uv/)
 
 ## Project Structure
 
 ```
 ├── app.py              # Flask API server
-├── adb_commands.py     # Command definitions
-├── run.sh / run.bat    # Launch scripts
+├── adb_commands.py     # Command definitions and execution logic
+├── run.sh / run.bat    # Launch scripts with auto-setup
+├── cleanup.sh          # Port cleanup utility
+├── pyproject.toml      # Python dependencies
 └── static/
     ├── index.html      # Web interface
     ├── css/style.css   # Styling
     └── js/app.js       # Frontend logic
 ```
 
+## API Reference
+
+The Flask backend exposes these endpoints:
+
+```
+GET  /                          # Web interface
+GET  /api/check-adb             # Verify ADB installation
+GET  /api/devices               # List connected devices
+GET  /api/device-info/<id>      # Get device details
+GET  /api/categories            # Get all command categories
+GET  /api/command-states/<id>   # Get current command states
+POST /api/execute               # Execute a command
+POST /api/get-setting           # Get current setting value
+```
+
+### Example API Usage
+
+**Check ADB availability:**
+```bash
+curl http://localhost:8765/api/check-adb
+```
+
+**List devices:**
+```bash
+curl http://localhost:8765/api/devices
+```
+
+**Execute a command:**
+```bash
+curl -X POST http://localhost:8765/api/execute \
+  -H "Content-Type: application/json" \
+  -d '{
+    "device_id": "your_device_id",
+    "command": "shell settings put global window_animation_scale 0.0",
+    "action": "disable"
+  }'
+```
+
+## Troubleshooting
+
+**No devices found?**
+- Verify USB cable is properly connected
+- Ensure USB debugging is enabled in Developer Options
+- Accept the debugging authorization prompt on your device
+- Try running `adb devices` in terminal to verify ADB can see your device
+- Try a different USB cable or port
+- On Linux, you may need udev rules for your device
+
+**ADB not found?**
+- Install ADB using the instructions above
+- Ensure ADB is in your system PATH
+- Restart your terminal after installation
+- On Windows, you may need to add the platform-tools directory to your PATH manually
+
+**Command failed or no effect?**
+- Check the console output for detailed error messages
+- Some commands require specific Android versions (API level)
+- Samsung-only commands won't work on other manufacturers
+- Some settings may require a device reboot to take effect
+- Try running the command manually via `adb shell` to see raw output
+
+**Port 8765 already in use?**
+```bash
+./cleanup.sh              # macOS/Linux
+pkill -f "python.*app.py" # Manual cleanup
+```
+
+**Permission denied errors?**
+- Ensure USB debugging is authorized
+- Some commands may not work on all devices/Android versions
+- Manufacturer-specific restrictions may apply
+
 ## Tech Stack
 
-- **Backend:** Python 3.10+, Flask, Flask-CORS
-- **Frontend:** Vanilla JS, HTML5, CSS3
-- **Tools:** ADB, UV package manager
+- **Backend:** Python 3.10+, Flask 3.0+, Flask-CORS 4.0+
+- **Frontend:** Vanilla JavaScript, HTML5, CSS3
+- **Tools:** Android Debug Bridge (ADB), UV package manager
+- **Design:** Responsive, mobile-first, accessible
 
-## Design Principles
+## Design Philosophy
 
-- **Pragmatic** - One-click toggles, persistent preferences
-- **Idiomatic** - RESTful API, standard patterns, semantic HTML
-- **Excellent** - Error handling, loading states, accessibility
+This tool follows three principles:
 
-## Disclaimer
+- **Pragmatic** - One-click toggles, automatic state detection, persistent preferences
+- **Humble** - Clear documentation, honest about limitations, no overselling
+- **Excellent** - Proper error handling, loading states, accessibility, clean code
 
-⚠️ These optimizations may affect battery life and stability. Some require device restart. Always understand commands before executing. Use at your own risk.
+## Important Notes
+
+⚠️ **Use with caution:**
+- These optimizations can affect battery life and device stability
+- Some commands may cause overheating, especially Fixed Performance Mode
+- Always understand what a command does before executing it
+- Some changes require a device reboot to take full effect
+- You can always re-enable settings through the interface
+
+⚠️ **Device compatibility:**
+- Most commands work on Android 5.0+ (API level 21+)
+- Samsung-specific commands are clearly marked
+- Some commands may not work on all devices or Android versions
+- Manufacturer skins (One UI, MIUI, etc.) may behave differently
+
+## Contributing
+
+Contributions are welcome! This is a straightforward project:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test with real devices
+5. Submit a pull request
+
+Areas for improvement:
+- Additional command categories
+- Better device compatibility detection
+- Batch command execution
+- Command presets/profiles
+- Undo/restore functionality
 
 ## Credits
 
-Based on [Technastic's ADB Commands Guide](https://technastic.com/adb-commands-improve-performance-android/)
+Command collection inspired by [Technastic's ADB Commands Guide](https://technastic.com/adb-commands-improve-performance-android/).
+
+Built for the Android developer community.
+
+## License
+
+MIT License - See LICENSE file for details.
 
 ---
 
-**MIT License** • Built for the Android community 💙
+**Questions or issues?** Open an issue on GitHub.
+
+**Found this useful?** Star the repository to help others discover it.
