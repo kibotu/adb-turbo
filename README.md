@@ -298,27 +298,6 @@ uv run pytest -k "test_execute"
 - Some commands may not work on all devices or Android versions
 - Manufacturer skins (One UI, MIUI, etc.) may behave differently
 
-## Development
-
-### Project Structure
-
-```
-adb/
-├── app.py              # Flask application and API endpoints
-├── adb_commands.py     # ADB command definitions and execution
-├── config.py           # Configuration management
-├── pyproject.toml      # Project dependencies
-├── pytest.ini          # Test configuration
-├── static/             # Frontend files
-│   ├── index.html
-│   ├── js/app.js
-│   └── css/style.css
-└── tests/              # Test suite
-    ├── test_app.py
-    ├── test_adb_commands.py
-    └── test_config.py
-```
-
 ### Security Features
 
 - **Command Injection Prevention**: Uses list-based subprocess calls instead of shell execution
@@ -339,7 +318,7 @@ export LOG_LEVEL=DEBUG
 
 ## Contributing
 
-Contributions are welcome! This is a straightforward project:
+Contributions are warmly welcomed! Whether you're fixing a bug, adding a feature, or improving documentation, your help makes this tool better for everyone. 🙌
 
 1. Fork the repository
 2. Create a feature branch
@@ -348,19 +327,24 @@ Contributions are welcome! This is a straightforward project:
 5. Test with real devices
 6. Submit a pull request
 
-Areas for improvement:
+**Ideas for contributions:**
 - Additional command categories
 - Better device compatibility detection
 - Batch command execution
 - Command presets/profiles
 - Undo/restore functionality
 - Enhanced test coverage
+- Translations and internationalization
+
+Every contribution, no matter how small, is appreciated! 💙
 
 ## Credits
 
 Command collection inspired by [Technastic's ADB Commands Guide](https://technastic.com/adb-commands-improve-performance-android/).
 
-Built for the Android developer community.
+**Made with ❤️ by [kibotu](https://github.com/kibotu) for the Android developer community.**
+
+Special thanks to all contributors who help make this tool better!
 
 
 ## License
@@ -383,6 +367,12 @@ limitations under the License.
 
 ---
 
-**Questions or issues?** Open an issue on GitHub.
+<div align="center">
 
-**Found this useful?** Star the repository to help others discover it.
+**Questions or issues?** Open an issue on GitHub – we're here to help! 🤝
+
+**Found this useful?** Give it a ⭐ to help others discover it!
+
+**Happy optimizing!** 🚀
+
+</div>
