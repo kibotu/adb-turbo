@@ -65,6 +65,9 @@ jobs:
     
     - name: Deploy to GitHub Pages
       run: |
+        # Save the build directory path
+        BUILD_DIR="$(pwd)/build"
+        
         # Configure git
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -74,6 +77,9 @@ jobs:
           echo "gh-pages branch exists, checking it out..."
           git fetch origin gh-pages
           git checkout gh-pages
+          # Remove all files except .git
+          git rm -rf .
+          git clean -fxd
         else
           echo "gh-pages branch does not exist, creating it..."
           git checkout --orphan gh-pages
@@ -81,7 +87,7 @@ jobs:
         fi
         
         # Copy build files to root
-        cp -r build/* .
+        cp -r "$BUILD_DIR"/* .
         
         # Add all files
         git add -A
