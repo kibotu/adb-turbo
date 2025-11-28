@@ -151,6 +151,86 @@
                 </div>
             </section>
 
+            <!-- Profiles & Presets -->
+            <section class="card profiles-card" id="profiles-card" style="display: none;">
+                <div class="card__header" onclick="toggleSection('profiles-card')">
+                    <h2 class="card__title">
+                        <span class="icon">💾</span>
+                        Profiles & Presets
+                    </h2>
+                    <button class="collapse-btn" aria-label="Toggle profiles">
+                        <span class="collapse-icon">▼</span>
+                    </button>
+                </div>
+                <div class="card__content">
+                    <!-- Quick Presets -->
+                    <div class="presets-section">
+                        <h3 class="section-subtitle">Quick Presets</h3>
+                        <p class="section-description">Apply optimized settings with one click</p>
+                        <div class="presets-grid">
+                            <button class="preset-chip preset-chip--performance" onclick="applyPreset('high_performance')">
+                                <span class="preset-chip__icon">🚀</span>
+                                <span class="preset-chip__name">High Performance</span>
+                                <span class="preset-chip__desc">Max speed & responsiveness</span>
+                            </button>
+                            <button class="preset-chip preset-chip--balanced" onclick="applyPreset('medium_performance')">
+                                <span class="preset-chip__icon">⚖️</span>
+                                <span class="preset-chip__name">Medium Performance</span>
+                                <span class="preset-chip__desc">Balanced experience</span>
+                            </button>
+                            <button class="preset-chip preset-chip--battery" onclick="applyPreset('max_battery')">
+                                <span class="preset-chip__icon">🔋</span>
+                                <span class="preset-chip__name">Max Battery</span>
+                                <span class="preset-chip__desc">Snappy & efficient</span>
+                            </button>
+                            <button class="preset-chip preset-chip--quality" onclick="applyPreset('max_quality')">
+                                <span class="preset-chip__icon">💎</span>
+                                <span class="preset-chip__name">Max Quality</span>
+                                <span class="preset-chip__desc">Best visuals & audio</span>
+                            </button>
+                            <button class="preset-chip preset-chip--recommended" onclick="applyPreset('recommended')">
+                                <span class="preset-chip__icon">⭐</span>
+                                <span class="preset-chip__name">Recommended</span>
+                                <span class="preset-chip__desc">Optimized settings</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Profile Management -->
+                    <div class="profile-management">
+                        <h3 class="section-subtitle">Profile Management</h3>
+                        <p class="section-description">Backup and restore your device settings</p>
+                        
+                        <div class="profile-actions">
+                            <button class="btn btn--primary" onclick="backupCurrentSettings()">
+                                <span class="btn__icon">💾</span>
+                                Backup Current Settings
+                            </button>
+                            <button class="btn btn--secondary" onclick="showRestoreDialog()">
+                                <span class="btn__icon">📥</span>
+                                Restore Settings
+                            </button>
+                            <button class="btn btn--secondary" onclick="exportProfile()">
+                                <span class="btn__icon">📤</span>
+                                Export Profile
+                            </button>
+                            <button class="btn btn--secondary" onclick="showImportDialog()">
+                                <span class="btn__icon">📥</span>
+                                Import Profile
+                            </button>
+                        </div>
+
+                        <!-- Backups List -->
+                        <div id="backups-list" class="backups-list" style="display: none;">
+                            <h4 class="backups-list__title">Available Backups</h4>
+                            <div id="backups-container" class="backups-container">
+                                <!-- Backups will be dynamically inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Command Categories -->
             <section id="categories-container">
                 <!-- Categories will be dynamically inserted here -->

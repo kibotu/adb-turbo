@@ -344,6 +344,7 @@ async function onDeviceSelected() {
         state.deviceInfo = null;
         document.getElementById('device-info').style.display = 'none';
         document.getElementById('device-details-card').style.display = 'none';
+        document.getElementById('profiles-card').style.display = 'none';
         stopAutoRefresh();
         return;
     }
@@ -355,6 +356,12 @@ async function onDeviceSelected() {
     
     // Load device info
     await loadDeviceInfo(deviceId);
+    
+    // Show profiles card
+    document.getElementById('profiles-card').style.display = 'block';
+    
+    // Load backups list
+    await loadBackupsList();
     
     // Start auto-refresh
     startAutoRefresh();
@@ -413,7 +420,8 @@ async function loadCommandStates(deviceId, silent = false) {
         
         const result = await apiRequest(`/api/command-states/${deviceId}`);
         
-        if (result.success && result.states) {
+        // apiRequest already extracts the data, so result.states is directly available
+        if (result && result.states) {
             // Update toggle switches based on actual device state
             let updatedCount = 0;
             Object.entries(result.states).forEach(([commandName, isEnabled]) => {
@@ -967,6 +975,373 @@ async function handleToggle(toggleElement) {
         logToConsole(`✗ Error executing ${command.name}: ${error.message}`, 'error');
     } finally {
         toggleElement.classList.remove('loading');
+    }
+}
+
+// ============================================
+// Profile Management
+// ============================================
+
+/**
+ * Backup current device settings
+ */
+async function backupCurrentSettings() {
+    if (!state.selectedDevice || !state.deviceInfo) {
+        logToConsole('Please select a device first', 'warning');
+        return;
+    }
+    
+    logToConsole('Backing up device settings...', 'info');
+    
+    try {
+        const result = await apiRequest('/api/profiles/backup', {
+            method: 'POST',
+            body: JSON.stringify({
+                device_id: state.selectedDevice,
+                manufacturer: state.deviceInfo.manufacturer,
+                model: state.deviceInfo.model
+            })
+        });
+        
+        logToConsole(`✓ Backup created: ${result.profile.settings ? Object.keys(result.profile.settings).length : 0} settings saved`, 'success');
+        
+        // Refresh backups list
+        await loadBackupsList();
+        
+    } catch (error) {
+        logToConsole(`✗ Backup failed: ${error.message}`, 'error');
+    }
+}
+
+/**
+ * Load backups list for current device
+ */
+async function loadBackupsList() {
+    if (!state.deviceInfo) return;
+    
+    try {
+        const result = await apiRequest('/api/profiles/list', {
+            method: 'POST',
+            body: JSON.stringify({
+                manufacturer: state.deviceInfo.manufacturer,
+                model: state.deviceInfo.model
+            })
+        });
+        
+        const backups = result.backups || [];
+        const container = document.getElementById('backups-container');
+        const listSection = document.getElementById('backups-list');
+        
+        if (backups.length === 0) {
+            listSection.style.display = 'none';
+            return;
+        }
+        
+        listSection.style.display = 'block';
+        container.innerHTML = '';
+        
+        backups.forEach((backup, index) => {
+            const item = createBackupItem(backup, index);
+            container.appendChild(item);
+        });
+        
+    } catch (error) {
+        console.error('Failed to load backups:', error);
+    }
+}
+
+/**
+ * Create backup item element
+ */
+function createBackupItem(backup, index) {
+    const item = document.createElement('div');
+    item.className = 'backup-item';
+    
+    const info = document.createElement('div');
+    info.className = 'backup-item__info';
+    
+    const label = document.createElement('div');
+    label.className = 'backup-item__label';
+    const date = new Date(backup.timestamp);
+    label.textContent = `Backup ${index + 1} - ${date.toLocaleString()}`;
+    
+    const meta = document.createElement('div');
+    meta.className = 'backup-item__meta';
+    const settingsCount = backup.settings ? Object.keys(backup.settings).length : 0;
+    meta.textContent = `${settingsCount} settings • ${backup.backup_type || 'manual'}`;
+    
+    info.appendChild(label);
+    info.appendChild(meta);
+    
+    const actions = document.createElement('div');
+    actions.className = 'backup-item__actions';
+    
+    const restoreBtn = document.createElement('button');
+    restoreBtn.className = 'btn btn--small btn--primary';
+    restoreBtn.innerHTML = '<span class="btn__icon">📥</span> Restore';
+    restoreBtn.onclick = () => restoreBackup(index);
+    
+    const exportBtn = document.createElement('button');
+    exportBtn.className = 'btn btn--small btn--secondary';
+    exportBtn.innerHTML = '<span class="btn__icon">📤</span> Export';
+    exportBtn.onclick = () => exportBackup(index);
+    
+    actions.appendChild(restoreBtn);
+    actions.appendChild(exportBtn);
+    
+    item.appendChild(info);
+    item.appendChild(actions);
+    
+    return item;
+}
+
+/**
+ * Restore backup by index
+ */
+async function restoreBackup(backupIndex) {
+    if (!state.selectedDevice || !state.deviceInfo) {
+        logToConsole('Please select a device first', 'warning');
+        return;
+    }
+    
+    if (!confirm(`Restore backup ${backupIndex + 1}? This will change your device settings.`)) {
+        return;
+    }
+    
+    logToConsole(`Restoring backup ${backupIndex + 1}...`, 'info');
+    
+    try {
+        const result = await apiRequest('/api/profiles/restore', {
+            method: 'POST',
+            body: JSON.stringify({
+                device_id: state.selectedDevice,
+                manufacturer: state.deviceInfo.manufacturer,
+                model: state.deviceInfo.model,
+                backup_index: backupIndex
+            })
+        });
+        
+        const results = result.results;
+        logToConsole(`✓ Restore complete: ${results.success.length} success, ${results.failed.length} failed, ${results.skipped.length} skipped`, 'success');
+        
+        if (results.failed.length > 0) {
+            logToConsole(`Failed settings: ${results.failed.map(f => f.name).join(', ')}`, 'warning');
+        }
+        
+        // Refresh command states
+        await loadCommandStates(state.selectedDevice, false);
+        
+    } catch (error) {
+        logToConsole(`✗ Restore failed: ${error.message}`, 'error');
+    }
+}
+
+/**
+ * Export backup by index
+ */
+async function exportBackup(backupIndex) {
+    if (!state.deviceInfo) {
+        logToConsole('Please select a device first', 'warning');
+        return;
+    }
+    
+    try {
+        const result = await apiRequest('/api/profiles/export', {
+            method: 'POST',
+            body: JSON.stringify({
+                manufacturer: state.deviceInfo.manufacturer,
+                model: state.deviceInfo.model,
+                backup_index: backupIndex
+            })
+        });
+        
+        const profile = result.profile;
+        
+        // Create download
+        const dataStr = JSON.stringify(profile, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `adb-turbo-profile-${state.deviceInfo.manufacturer}-${state.deviceInfo.model}-${Date.now()}.json`;
+        link.click();
+        
+        URL.revokeObjectURL(url);
+        
+        logToConsole('✓ Profile exported successfully', 'success');
+        
+    } catch (error) {
+        logToConsole(`✗ Export failed: ${error.message}`, 'error');
+    }
+}
+
+/**
+ * Export current profile (latest backup)
+ */
+async function exportProfile() {
+    await exportBackup(0);
+}
+
+/**
+ * Show restore dialog
+ */
+function showRestoreDialog() {
+    if (!state.deviceInfo) {
+        logToConsole('Please select a device first', 'warning');
+        return;
+    }
+    
+    // Scroll to backups list
+    const backupsList = document.getElementById('backups-list');
+    if (backupsList.style.display === 'none') {
+        logToConsole('No backups available. Create a backup first.', 'warning');
+        return;
+    }
+    
+    backupsList.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/**
+ * Show import dialog
+ */
+function showImportDialog() {
+    if (!state.selectedDevice) {
+        logToConsole('Please select a device first', 'warning');
+        return;
+    }
+    
+    // Create modal
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.onclick = (e) => {
+        if (e.target === overlay) {
+            document.body.removeChild(overlay);
+        }
+    };
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    
+    modal.innerHTML = `
+        <div class="modal__header">
+            <h3 class="modal__title">Import Profile</h3>
+            <button class="modal__close" onclick="this.closest('.modal-overlay').remove()">×</button>
+        </div>
+        <div class="modal__content">
+            <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-lg);">
+                Select a profile JSON file to import. The profile will be added to your backups list.
+            </p>
+            <div class="file-input-wrapper">
+                <input type="file" id="profile-file-input" accept=".json" />
+                <label for="profile-file-input" class="file-input-label">
+                    <span>📁</span>
+                    <span id="file-label-text">Click to select profile file</span>
+                </label>
+            </div>
+        </div>
+        <div class="modal__footer">
+            <button class="btn btn--secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+            <button class="btn btn--primary" id="import-confirm-btn" disabled>Import</button>
+        </div>
+    `;
+    
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    
+    // Setup file input handler
+    const fileInput = document.getElementById('profile-file-input');
+    const fileLabel = document.getElementById('file-label-text');
+    const fileLabelWrapper = fileInput.nextElementSibling;
+    const importBtn = document.getElementById('import-confirm-btn');
+    
+    fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            fileLabel.textContent = file.name;
+            fileLabelWrapper.classList.add('has-file');
+            importBtn.disabled = false;
+        }
+    };
+    
+    importBtn.onclick = async () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        
+        try {
+            const text = await file.text();
+            const profileData = JSON.parse(text);
+            
+            const result = await apiRequest('/api/profiles/import', {
+                method: 'POST',
+                body: JSON.stringify({
+                    profile: profileData,
+                    device_id: state.selectedDevice
+                })
+            });
+            
+            logToConsole('✓ Profile imported successfully', 'success');
+            overlay.remove();
+            
+            // Refresh backups list
+            await loadBackupsList();
+            
+        } catch (error) {
+            logToConsole(`✗ Import failed: ${error.message}`, 'error');
+        }
+    };
+}
+
+/**
+ * Apply preset configuration
+ */
+async function applyPreset(presetName) {
+    if (!state.selectedDevice) {
+        logToConsole('Please select a device first', 'warning');
+        return;
+    }
+    
+    const presetNames = {
+        'high_performance': 'High Performance',
+        'medium_performance': 'Medium Performance',
+        'max_battery': 'Max Battery',
+        'max_quality': 'Max Quality',
+        'recommended': 'Recommended'
+    };
+    
+    const displayName = presetNames[presetName] || presetName;
+    
+    if (!confirm(`Apply "${displayName}" preset? This will change multiple device settings.`)) {
+        return;
+    }
+    
+    logToConsole(`Applying "${displayName}" preset...`, 'info');
+    
+    try {
+        const result = await apiRequest('/api/profiles/apply-preset', {
+            method: 'POST',
+            body: JSON.stringify({
+                device_id: state.selectedDevice,
+                preset_name: presetName
+            })
+        });
+        
+        const results = result.results;
+        logToConsole(`✓ Preset applied: ${results.success.length} settings changed`, 'success');
+        
+        if (results.failed.length > 0) {
+            logToConsole(`Failed: ${results.failed.map(f => f.name).join(', ')}`, 'warning');
+        }
+        
+        // Refresh command states
+        await loadCommandStates(state.selectedDevice, false);
+        
+        // Auto-backup after applying preset
+        logToConsole('Creating automatic backup...', 'info');
+        await backupCurrentSettings();
+        
+    } catch (error) {
+        logToConsole(`✗ Failed to apply preset: ${error.message}`, 'error');
     }
 }
 
