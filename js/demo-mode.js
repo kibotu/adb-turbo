@@ -17,8 +17,9 @@
       
       console.log('🎭 Intercepting API call:', endpoint);
       
-      // Convert API endpoint to static JSON file path
-      const jsonPath = endpoint.replace('/api/', '/api/') + '.json';
+      // Convert API endpoint to static JSON file path (relative)
+      // /api/check-adb -> ./api/check-adb.json
+      const jsonPath = '.' + endpoint + '.json';
       
       try {
         const response = await originalFetch(jsonPath);
